@@ -1,0 +1,38 @@
+---
+const skillCategories = [
+  {
+    title: "Languages",
+    skills: ["C++", "Golang", "Python", "Node.js", "Ruby", "ColdFusion", "HTML/CSS", "SQL"],
+  },
+  {
+    title: "Frameworks & Databases",
+    skills: ["ExpressJS", "Rails", "ColdBox", "PostgreSQL", "MySQL", "MariaDB", "MongoDB"],
+  },
+  {
+    title: "Developer Tools",
+    skills: ["Git", "GitHub", "Docker", "Bash", "Postman", "VS Code"],
+  },
+];
+---
+
+<section id="skills" class="py-24 px-6 bg-[var(--color-surface)]">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Technical Skills</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      {skillCategories.map((cat) => (
+        <div class="bg-[var(--color-bg)] rounded-xl p-6 shadow-sm border border-[var(--color-card-border)]">
+          <h3 class="text-sm font-semibold text-accent uppercase tracking-wider mb-4">
+            {cat.title}
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {cat.skills.map((skill) => (
+              <span class="px-3 py-1.5 bg-[var(--color-surface)] text-[var(--color-text)] text-sm rounded-lg border border-[var(--color-card-border)] hover:bg-accent/10 hover:border-accent/40 hover:text-accent transition-colors cursor-default">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

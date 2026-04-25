@@ -1,0 +1,95 @@
+---
+const projects = [
+  {
+    title: "Real Estate Property Investment Analysis",
+    tech: "Flask, scikit-learn, XGBoost, NLTK, spaCy, Transformers",
+    github: "https://github.com/mohsinian/altri-challenge",
+    items: [
+      "Scores properties based on their flipping potential using trained models and NLP analysis to predict resale values and renovation costs",
+      "Visualizes properties on an interactive map with color-coded grades along with property filters such as price, bedrooms, bathrooms, ROI, and more",
+      "Compares multiple ML algorithms (Linear Regression, Random Forest, Gradient Boosting, XGBoost) and selects the best performer for each prediction task",
+      "Performs sentiment analysis on property descriptions using transformer models and extracts renovation levels to drive risk assessment and grade assignment",
+    ],
+  },
+  {
+    title: "Short Term Rental System",
+    tech: "FastAPI, Supabase",
+    github: "https://github.com/mohsinian/Short-Term-Rental-System",
+    demo: "https://short-term-rental-frontend.onrender.com/",
+    backend: "https://short-term-rental-api-yp25.onrender.com/",
+    items: [
+      "Implemented high-performance data loading in Supabase",
+      "Solved critical N+1 performance bottleneck in property scoring by implementing batch fetching and bulk upsert operations",
+      "Designed and implemented an 8-component weighted scoring system for evaluating STR investment opportunities",
+      "Frontend and backend containerised as separate services, deployed on Render",
+    ],
+  },
+  {
+    title: "Integration Gateway",
+    tech: "Go, PostgreSQL",
+    github: "https://github.com/mohsinian/integration-gateway",
+    items: [
+      "Designed layered microservice architecture with REST API, batch worker pool, and health check endpoints",
+      "Implemented production-grade resilience patterns including circuit breakers, exponential backoff retry, and token bucket rate limiting",
+      "Built multi-source data orchestrator supporting concurrent JSON/XML external API calls with idempotency via database constraints",
+      "Containerised application and mock services with fault injection for chaos testing, orchestrated via Docker Compose",
+    ],
+  },
+];
+---
+
+<section id="projects" class="py-24 px-6 bg-[var(--color-surface)]">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Projects</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      {projects.map((proj, i) => (
+        <article class={`bg-[var(--color-bg)] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-[var(--color-card-border)]${projects.length % 2 !== 0 && i === projects.length - 1 ? " md:col-span-2" : ""}`}>
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-[var(--color-primary)] mb-1">{proj.title}</h3>
+            <p class="text-xs text-accent font-medium">{proj.tech}</p>
+          </div>
+          <ul class="space-y-2 mb-6">
+            {proj.items.map((item) => (
+              <li class="text-[var(--color-text-light)] text-sm leading-relaxed pl-4 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-card-border)]">
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div class="space-y-2">
+            <div class="flex gap-3">
+              <a
+                href={proj.github}
+                target="_blank"
+                class="text-sm text-accent hover:underline font-medium"
+              >
+                GitHub &rarr;
+              </a>
+              {proj.demo && (
+                <a
+                  href={proj.demo}
+                  target="_blank"
+                  class="text-sm text-accent hover:underline font-medium"
+                >
+                  Live Demo &rarr;
+                </a>
+              )}
+            </div>
+            {proj.backend && (
+              <p class="text-xs text-[var(--color-text-light)] opacity-70">
+                &#9888; On Render (cold start) &mdash; visit the
+                <a
+                  href={proj.backend}
+                  target="_blank"
+                  class="text-accent hover:underline"
+                >
+                  backend
+                </a>
+                first to wake it up, then open the demo.
+              </p>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

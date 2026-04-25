@@ -1,0 +1,73 @@
+---
+const experiences = [
+  {
+    company: "WellDev",
+    companyUrl: "https://welldev.io",
+    role: "Software Engineer L2",
+    period: "July 2025 - Present",
+    tech: "Node.js",
+    items: [
+      `Developed an Interface Service to ingest and process GIS-based Light Signal Adapter data streamed via MQTT for DVB (Dresdner Verkehrsbetriebe AG), applied ETL transformations with a custom queuing and batch ingestion mechanism, and delivered the processed data to the driver's mobile application Innotix öV-Pad`,
+      `Developed a service integrating with the DiLoc interface to ingest train location and timetable data, process it via an ETL pipeline, and deliver it to the driver's mobile application Innotix öV-Pad`,
+      `Developed backend services for the Innotix Hirsch driver platform used by AAGL, supporting duty management, extra work reporting, automated payment calculations, leave management, and real-time notifications`,
+      `Contributed to a genetic algorithm–based scheduling system within Innotix Hirsch that autonomously generates and assigns optimal driver duty schedules, improving operational efficiency and resource utilization for AAGL`,
+    ],
+  },
+  {
+    company: "WellDev",
+    companyUrl: "https://welldev.io",
+    role: "Junior Software Engineer L1",
+    period: "March 2024 - June 2025",
+    tech: "Node.js, ColdFusion",
+    items: [
+      `Engineered and maintained backend infrastructure for InnoTix's Electronic Driver Bag platform, supporting a complex 500K LOC multi-tenant codebase that serves 42+ European public transportation clients across bus, train, and tram sectors`,
+      `Resolved 20+ high-priority SLA-bound bugs through proactive cross-team collaboration, while actively developing shell scripts, documentation, and IDE code snippets to automate development activities`,
+      `Migrated password algorithm from md5 hash to Bcrypt hash to improve security`,
+      `Mentored trainees within the development team, guiding them through projects and debugging techniques`,
+      `Participated in interview panels for new trainee selections, contributing to the hiring process`,
+      `Orchestrated knowledge transfer sessions and developed comprehensive documentation to facilitate smooth onboarding and legacy system knowledge preservation`,
+    ],
+  },
+  {
+    company: "Brain Station 23",
+    companyUrl: "https://drive.google.com/file/d/1f3x5S-oyqLI4xqZ6YcGxcW_zbv4vbLMB/view",
+    role: "Trainee Software Engineer",
+    period: "July 2022 - October 2022",
+    tech: ".NET, EF Core",
+    items: [
+      `Explored the nopCommerce codebase to understand template and plugin development processes`,
+      `Assisted in the development of templates and plugins for nopCommerce, worked with .NET Core and Entity Framework`,
+    ],
+  },
+];
+---
+
+<section id="experience" class="py-24 px-6">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Professional Experience</h2>
+    <div class="space-y-12">
+      {experiences.map((exp) => (
+        <article class="relative pl-8 border-l-2 border-[var(--color-border)] hover:border-accent transition-colors">
+          <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-accent" />
+          <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mb-3">
+            <h3 class="text-lg font-bold text-[var(--color-primary)]">
+              <a href={exp.companyUrl} target="_blank" class="hover:text-accent transition-colors">
+                {exp.company}
+              </a>
+              <span class="text-[var(--color-text-light)] font-normal text-sm ml-2">| {exp.tech}</span>
+            </h3>
+            <span class="text-sm text-[var(--color-text-light)]">{exp.period}</span>
+          </div>
+          <p class="text-accent font-medium text-sm mb-4">{exp.role}</p>
+          <ul class="space-y-2">
+            {exp.items.map((item) => (
+              <li class="text-[var(--color-text-light)] text-sm leading-relaxed pl-4 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-full before:bg-[var(--color-card-border)]">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
