@@ -15,7 +15,7 @@ const { title } = Astro.props;
     <link rel="icon" type="image/png" href="/profile.png" />
     <title>{title}</title>
     <script is:inline>
-      if (localStorage.getItem("theme") === "dark" || (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      if (localStorage.getItem("theme") !== "light") {
         document.documentElement.classList.add("dark");
       }
     </script>

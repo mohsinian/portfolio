@@ -82,7 +82,7 @@ const navLinks = [
   }
 
   // Restore saved theme
-  const isDark = localStorage.getItem("theme") === "dark" || (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark = localStorage.getItem("theme") !== "light";
   applyTheme(isDark);
 
   toggle?.addEventListener("click", () => {
