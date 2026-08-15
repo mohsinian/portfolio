@@ -1,0 +1,145 @@
+---
+// Full-page living constellation (see src/scripts/background-scene.ts) plus
+// the request-log ticker that narrates it. Purely decorative: pointer-events
+// none everywhere, and everything hides for reduced-motion users.
+---
+
+<canvas id="bg-canvas" class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true"></canvas>
+<div
+  class="pointer-events-none fixed inset-0 -z-10"
+  style="background: radial-gradient(ellipse 90% 70% at 50% 42%, transparent 45%, var(--color-bg) 100%)"
+  aria-hidden="true"
+></div>
+
+<div
+  id="request-log"
+  class="pointer-events-none fixed bottom-4 left-4 z-20 hidden sm:block font-mono text-[11px] leading-5 opacity-70 transition-opacity duration-700"
+  aria-hidden="true"
+></div>
+
+<script>
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Lazy-load the 3D scene so it never blocks first paint.
+  const canvas = document.getElementById("bg-canvas") as HTMLCanvasElement | null;
+  if (canvas) {
+    const start = () =>
+      import("../scripts/background-scene").then((m) => m.mountBackgroundScene(canvas));
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => void start(), { timeout: 2000 });
+    } else {
+      setTimeout(() => void start(), 200);
+    }
+  }
+
+  // Request ticker — fake traffic logs flavoured with the real domain
+  // (DVB/MQTT ingest, duty scheduling, the usual backend suspects).
+  const lines = [
+    "GET /v1/timetables · 200 · 38ms",
+    "MQTT ▸ dvb/lsa/# · qos1 · 240 msg/s",
+    "POST /v1/auth/token · 201 · 12ms",
+    "KAFKA ▸ duty.assigned → scheduler",
+    "redis ▸ GET duty:4201 · HIT · 0.4ms",
+    "postgres ▸ duty roster query · 18ms",
+    "LB ▸ 10.0.3.17 → svc-api-3 · healthy",
+    "GET /v1/position?train=RB45 · 200 · 21ms",
+    "worker ▸ batch ETL · 1,204 rows committed",
+    "200 OK ▸ response in 42ms",
+  ];
+
+  const log = document.getElementById("request-log");
+  if (log) {
+    const render = (entries: string[]) => {
+      log.innerHTML = "";
+      entries.forEach((entry, i) => {
+        const row = document.createElement("div");
+        row.textContent = entry;
+        // newest line gets the accent colour
+        if (i === entries.length - 1) row.className = "text-accent";
+        log.appendChild(row);
+      });
+    };
+
+    const entries: string[] = lines.slice(0, 3);
+    render(entries);
+    // slower cadence for reduced-motion users — the log still lives, calmly
+    const cadence = reducedMotion ? 3200 : 1600;
+    let index = 3;
+    setInterval(() => {
+      entries.push(lines[index % lines.length]);
+      if (entries.length > 5) entries.shift();
+      index++;
+      render(entries);
+    }, cadence);
+
+    // Fade the ticker out once the visitor scrolls into the content.
+    window.addEventListener(
+      "scroll",
+      () => {
+        const progress =
+          window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+        log.style.opacity = progress > 0.12 ? "0" : "0.7";
+      },
+      { passive: true },
+    );
+  }
+
+  // Proximity work-light: free-floating .lit-text glows as the cursor nears
+  // it. Runs everywhere; devices without a pointer simply never move it.
+  const litTargets = Array.from(document.querySelectorAll<HTMLElement>(".lit-text"));
+  if (litTargets.length > 0) {
+    let cx = -9999;
+    let cy = -9999;
+    let raf = 0;
+    const apply = () => {
+      raf = 0;
+      for (const el of litTargets) {
+        const rect = el.getBoundingClientRect();
+        const dx = Math.max(rect.left - cx, 0, cx - rect.right);
+        const dy = Math.max(rect.top - cy, 0, cy - rect.top);
+        const dist = Math.hypot(dx, dy);
+        el.style.setProperty("--lit", Math.max(0, 1 - dist / 280).toFixed(3));
+      }
+    };
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        cx = event.clientX;
+        cy = event.clientY;
+        if (!raf) raf = requestAnimationFrame(apply);
+      },
+      { passive: true },
+    );
+    document.documentElement.addEventListener("pointerleave", () => {
+      cx = -9999;
+      cy = -9999;
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+  }
+
+  // Reading mode: hovering a content panel blurs the rail line behind it.
+  // Driven by pointermove (fires continuously, self-heals missed boundaries).
+  const bgCanvas = document.getElementById("bg-canvas");
+  if (bgCanvas) {
+    let recedeRaf = 0;
+    let lastEvent: PointerEvent | null = null;
+    document.addEventListener(
+      "pointermove",
+      (event) => {
+        lastEvent = event;
+        if (!recedeRaf) {
+          recedeRaf = requestAnimationFrame(() => {
+            recedeRaf = 0;
+            const target =
+              lastEvent?.target instanceof Element ? (lastEvent.target as Element) : null;
+            bgCanvas.classList.toggle("recede", !!target?.closest(".machine-panel"));
+          });
+        }
+      },
+      { passive: true },
+    );
+    document.documentElement.addEventListener("pointerleave", () => {
+      bgCanvas.classList.remove("recede");
+    });
+  }
+</script>

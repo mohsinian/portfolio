@@ -1,5 +1,5 @@
 ---
-
+import { cv, cvIsConfigured } from "../config/site";
 ---
 
 <footer class="py-12 px-6 border-t border-[var(--color-border)]">
@@ -8,6 +8,11 @@
       &copy; {new Date().getFullYear()} Tahsin Ahmed Majumder
     </p>
     <div class="flex gap-6">
+      {cvIsConfigured && (
+        <a href={cv.view} target="_blank" rel="noopener noreferrer" class="text-[var(--color-text-light)] hover:text-accent transition-colors text-sm">
+          CV &rarr;
+        </a>
+      )}
       <a href="https://www.linkedin.com/in/tahsin-ahmed-37663b1ab/" target="_blank" class="text-[var(--color-text-light)] hover:text-accent transition-colors text-sm">
         LinkedIn
       </a>

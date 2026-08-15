@@ -35,15 +35,26 @@ const projects = [
       "Containerised application and mock services with fault injection for chaos testing, orchestrated via Docker Compose",
     ],
   },
+  {
+    title: "Interface Service",
+    tech: "Node.js, MariaDB",
+    note: "Innotix internal project — in production at DVB",
+    items: [
+      "Led the end-to-end development of an Interface Service ingesting and processing real-time transit data",
+      "Engineered a high-performance ETL pipeline with a custom message queue and batch ingestion mechanism for MQTT-streamed GIS data",
+      "Developed robust data adapters integrating multiple third-party interfaces (e.g., DiLoc, IVU) for train locations and timetables",
+      "Resolved critical performance bottlenecks, improving data processing throughput by 300%",
+    ],
+  },
 ];
 ---
 
-<section id="projects" class="py-24 px-6 bg-[var(--color-surface)]">
+<section id="projects" class="py-24 px-6">
   <div class="max-w-5xl mx-auto">
     <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Projects</h2>
     <div class="grid md:grid-cols-2 gap-6">
       {projects.map((proj, i) => (
-        <article class={`bg-[var(--color-bg)] rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-[var(--color-card-border)]${projects.length % 2 !== 0 && i === projects.length - 1 ? " md:col-span-2" : ""}`}>
+        <article class={`machine-panel p-6${projects.length % 2 !== 0 && i === projects.length - 1 ? " md:col-span-2" : ""}`}>
           <div class="mb-4">
             <h3 class="text-lg font-bold text-[var(--color-primary)] mb-1">{proj.title}</h3>
             <p class="text-xs text-accent font-medium">{proj.tech}</p>
@@ -57,13 +68,15 @@ const projects = [
           </ul>
           <div class="space-y-2">
             <div class="flex gap-3">
-              <a
-                href={proj.github}
-                target="_blank"
-                class="text-sm text-accent hover:underline font-medium"
-              >
-                GitHub &rarr;
-              </a>
+              {proj.github && (
+                <a
+                  href={proj.github}
+                  target="_blank"
+                  class="text-sm text-accent hover:underline font-medium"
+                >
+                  GitHub &rarr;
+                </a>
+              )}
               {proj.demo && (
                 <a
                   href={proj.demo}
@@ -74,6 +87,9 @@ const projects = [
                 </a>
               )}
             </div>
+            {proj.note && (
+              <p class="text-xs text-[var(--color-text-light)] opacity-70">{proj.note}</p>
+            )}
             {proj.backend && (
               <p class="text-xs text-[var(--color-text-light)] opacity-70">
                 &#9888; On Render (cold start) &mdash; visit the

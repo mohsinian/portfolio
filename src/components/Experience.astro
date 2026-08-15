@@ -47,7 +47,7 @@ const experiences = [
     <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Professional Experience</h2>
     <div class="space-y-12">
       {experiences.map((exp) => (
-        <article class="relative pl-8 border-l-2 border-[var(--color-border)] hover:border-accent transition-colors">
+        <article class="machine-panel relative pl-8 pr-6 py-5">
           <div class="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-accent" />
           <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mb-3">
             <h3 class="text-lg font-bold text-[var(--color-primary)]">
@@ -71,3 +71,28 @@ const experiences = [
     </div>
   </div>
 </section>
+
+<script>
+  // Experiences are destinations on the line: the entry nearest the middle
+  // of the viewport is "at station" while the train passes through.
+  const articles = Array.from(document.querySelectorAll<HTMLElement>("#experience article"));
+  if (articles.length > 0) {
+    const update = () => {
+      const center = window.innerHeight / 2;
+      let best = -1;
+      let bestDist = Infinity;
+      articles.forEach((el, i) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        const dist = Math.abs((rect.top + rect.bottom) / 2 - center);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      articles.forEach((el, i) => el.classList.toggle("at-station", i === best));
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+  }
+</script>

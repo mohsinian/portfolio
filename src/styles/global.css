@@ -8,6 +8,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Painted behind the fixed background-scene canvas (-z-10) */
+  background-color: var(--color-bg);
 }
 
 ::selection {
@@ -46,6 +48,165 @@ html.dark {
 }
 
 body {
-  background-color: var(--color-bg);
   color: var(--color-text);
+}
+
+/*
+ * Machine panels — content blocks styled as units on the factory floor.
+ * Frosted so the production-line background peeks through while text stays
+ * readable; hovering powers the unit on (fluorescent flicker + status LED).
+ */
+.machine-panel {
+  position: relative;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--color-card-border);
+  border-radius: 0.75rem;
+  transition: border-color 250ms ease, box-shadow 250ms ease, background 250ms ease;
+}
+
+/* Welding torch beam — sweeps across the panel on hover */
+.machine-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(191, 219, 254, 0.05) 38%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(191, 219, 254, 0.05) 62%,
+    transparent 100%
+  );
+  transform: translateX(-130%);
+}
+
+.machine-panel :is(h3, p, li, a, span) {
+  transition: color 200ms ease, text-shadow 200ms ease;
+}
+
+/* Destination lit: the experience entry the train is stopped at */
+.machine-panel.at-station {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 30px color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+.machine-panel.at-station::after {
+  background: var(--color-accent);
+  box-shadow: 0 0 12px var(--color-accent);
+}
+
+/* Reading mode: hovering a content panel blurs the rail behind it */
+#bg-canvas {
+  transition: filter 350ms ease;
+}
+
+#bg-canvas.recede {
+  filter: blur(5px) brightness(0.75) saturate(0.9);
+}
+
+.machine-panel::after {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-card-border);
+  transition: background 250ms ease, box-shadow 250ms ease;
+}
+
+.machine-panel:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-accent) 40%, transparent),
+    0 0 64px color-mix(in srgb, var(--color-accent) 25%, transparent);
+}
+
+/* Dark mode: hovering is a work light — panel darkens, text glows bright */
+html.dark .machine-panel:hover {
+  background: color-mix(in srgb, var(--color-bg) 78%, #000);
+}
+html.dark .machine-panel:hover :is(h3, p, li, a, span, div) {
+  text-shadow:
+    0 0 18px rgba(147, 197, 253, 0.6),
+    0 0 4px rgba(255, 255, 255, 0.35);
+}
+html.dark .machine-panel:hover [class*="text-light"] {
+  color: #e2e8f0;
+}
+
+/* Light mode: hovered panel goes solid white, muted text darkens */
+html:not(.dark) .machine-panel:hover {
+  background: #ffffff;
+}
+html:not(.dark) .machine-panel:hover [class*="text-light"] {
+  color: #334155;
+}
+
+.machine-panel:hover::after {
+  background: var(--color-accent);
+  box-shadow: 0 0 16px var(--color-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .machine-panel:hover::before {
+    animation: weld-sweep 850ms ease-out;
+  }
+  .machine-panel:hover {
+    animation: weld-arc 700ms ease-out;
+  }
+  @keyframes weld-sweep {
+    0% { transform: translateX(-130%); opacity: 0; }
+    8% { opacity: 1; }
+    55% { opacity: 1; }
+    100% { transform: translateX(130%); opacity: 0; }
+  }
+  /* Arc strike: rapid white-hot strobing, then a hot steady glow */
+  @keyframes weld-arc {
+    0% { filter: brightness(1); }
+    6% { filter: brightness(2.4) saturate(1.4); }
+    12% { filter: brightness(0.85); }
+    20% { filter: brightness(2.1); }
+    28% { filter: brightness(0.95); }
+    38% { filter: brightness(1.8); }
+    50% { filter: brightness(1.05); }
+    65% { filter: brightness(1.45); }
+    100% { filter: brightness(1.15); }
+  }
+}
+
+/*
+ * Proximity work-light for free-floating text (no boxes). A script sets
+ * --lit (0..1) based on cursor distance; nearby text brightens and glows.
+ */
+@property --lit {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: true;
+}
+
+.lit-text {
+  --lit: 0;
+  transition: --lit 180ms linear;
+}
+
+html.dark .lit-text {
+  color: color-mix(in srgb, var(--color-text-light), #ffffff calc(var(--lit) * 100%));
+  text-shadow:
+    0 0 calc(4px + var(--lit) * 22px) rgba(147, 197, 253, calc(var(--lit) * 0.8)),
+    0 0 calc(var(--lit) * 4px) rgba(255, 255, 255, calc(var(--lit) * 0.5));
+}
+
+html:not(.dark) .lit-text {
+  color: color-mix(in srgb, var(--color-text-light), #0f172a calc(var(--lit) * 100%));
+  text-shadow: 0 0 calc(2px + var(--lit) * 14px) rgba(245, 158, 11, calc(var(--lit) * 0.35));
 }

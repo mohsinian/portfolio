@@ -1,4 +1,6 @@
 ---
+import { cv, cvIsConfigured } from "../config/site";
+
 const navLinks = [
   { label: "About", href: "#about" },
   { label: "Skills", href: "#skills" },
@@ -36,6 +38,16 @@ const navLinks = [
           {link.label}
         </a>
       ))}
+      {cvIsConfigured && (
+        <a
+          href={cv.view}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm px-4 py-2 border border-accent text-accent rounded-lg hover:bg-accent hover:text-white transition-colors duration-200"
+        >
+          CV
+        </a>
+      )}
       <a
         href="mailto:tahsinbd.ahmed1@gmail.com"
         class="text-sm px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-light transition-colors duration-200"
@@ -57,6 +69,16 @@ const navLinks = [
         {link.label}
       </a>
     ))}
+    {cvIsConfigured && (
+      <a
+        href={cv.view}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="block text-sm px-4 py-2 border border-accent text-accent rounded-lg text-center hover:bg-accent hover:text-white transition-colors"
+      >
+        CV
+      </a>
+    )}
     <a
       href="mailto:tahsinbd.ahmed1@gmail.com"
       class="block text-sm px-4 py-2 bg-accent text-white rounded-lg text-center hover:bg-accent-light transition-colors"
