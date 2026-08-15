@@ -1,0 +1,195 @@
+---
+import { cv } from "../config/site";
+---
+
+<main id="terminal-interface" class="terminal-shell" aria-label="Interactive terminal portfolio">
+  <div class="terminal-glow" aria-hidden="true"></div>
+  <div class="terminal-window">
+    <header class="terminal-titlebar">
+      <div class="traffic-lights" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p>tahsin@portfolio: ~</p>
+      <div class="terminal-status"><span class="status-dot"></span> online</div>
+    </header>
+
+    <div class="terminal-toolbar" aria-label="Suggested commands">
+      <span>TRY:</span>
+      <button type="button" data-command="whoistahsin">whoistahsin</button>
+      <button type="button" data-command="ls projects">ls projects</button>
+      <button type="button" data-command="cat experience.log">cat experience.log</button>
+      <button type="button" data-command="skills --matrix">skills --matrix</button>
+      <button type="button" data-command="contact">contact</button>
+    </div>
+
+    <section id="terminal-output" class="terminal-output" aria-live="polite" aria-label="Terminal output">
+      <div class="boot-block">
+        <pre class="ascii-mark" aria-label="TAM">████████╗ █████╗ ███╗   ███╗
+╚══██╔══╝██╔══██╗████╗ ████║
+   ██║   ███████║██╔████╔██║
+   ██║   ██╔══██║██║╚██╔╝██║
+   ██║   ██║  ██║██║ ╚═╝ ██║
+   ╚═╝   ╚═╝  ╚═╝╚═╝     ╚═╝</pre>
+        <div>
+          <p><span class="term-green">portfolio-shell v2.0.26</span> <span class="term-dim">// Dhaka, BD</span></p>
+          <p class="term-dim">Backend engineer. Transit systems. Somewhat overqualified rubber duck.</p>
+          <p class="welcome-line">Type <button type="button" data-command="/help">/help</button> to explore, or try <button type="button" data-command="whoistahsin">whoistahsin</button> <span class="term-dim">(because whoami is too generic).</span></p>
+        </div>
+      </div>
+    </section>
+
+    <form id="terminal-form" class="terminal-input-row" autocomplete="off">
+      <label for="terminal-input" class="terminal-prompt"><span>tahsin</span><b>@</b><span>portfolio</span><b>:</b><em>~</em><b>$</b></label>
+      <div class="terminal-input-wrap">
+        <span id="terminal-ghost" class="terminal-ghost" aria-hidden="true"></span>
+        <input id="terminal-input" name="command" type="text" inputmode="text" spellcheck="false" aria-describedby="terminal-hint" />
+      </div>
+    </form>
+    <footer class="terminal-footer">
+      <span id="terminal-hint"><kbd>tab</kbd> autocomplete <kbd>↑</kbd><kbd>↓</kbd> history <kbd>ctrl+l</kbd> clear</span>
+      <span><span class="term-green">●</span> bash-ish</span>
+    </footer>
+  </div>
+</main>
+
+<template id="terminal-config" data-cv={cv.view}></template>
+
+<script>
+  const output = document.getElementById("terminal-output");
+  const form = document.getElementById("terminal-form") as HTMLFormElement | null;
+  const input = document.getElementById("terminal-input") as HTMLInputElement | null;
+  const config = document.getElementById("terminal-config") as HTMLTemplateElement | null;
+  const ghost = document.getElementById("terminal-ghost");
+  const cvUrl = config?.dataset.cv ?? "/Tahsin_Ahmed_Majumder_CV.pdf";
+
+  const escapeHtml = (value: string) => value.replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char] ?? char);
+  const link = (href: string, label: string) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${label} ↗</a>`;
+  const commands = ["/help", "whoistahsin", "ls", "ls projects", "cat experience.log", "skills --matrix", "education", "achievements", "contact", "open github", "open linkedin", "download cv", "neofetch", "pwd", "date", "clear", "exit"];
+  const history: string[] = [];
+  let historyIndex = 0;
+
+  const updateGhost = () => {
+    if (!input || !ghost) return;
+    const value = input.value;
+    const match = value ? commands.find((command) => command.startsWith(value.toLowerCase()) && command !== value.toLowerCase()) : "";
+    ghost.textContent = match ? value + match.slice(value.length) : "";
+    ghost.classList.toggle("is-visible", Boolean(match));
+  };
+
+  const help = `<div class="command-result"><p class="result-title">Available commands</p><div class="help-grid">
+    <button data-command="whoistahsin"><b>whoistahsin</b><span>the human behind the prompt</span></button>
+    <button data-command="cat experience.log"><b>cat experience.log</b><span>production history, no stack traces</span></button>
+    <button data-command="ls projects"><b>ls projects</b><span>things that escaped localhost</span></button>
+    <button data-command="skills --matrix"><b>skills --matrix</b><span>weapons of mass construction</span></button>
+    <button data-command="education"><b>education</b><span>formal training arc</span></button>
+    <button data-command="achievements"><b>achievements</b><span>competitive programming stats</span></button>
+    <button data-command="contact"><b>contact</b><span>open communication ports</span></button>
+    <button data-command="neofetch"><b>neofetch</b><span>system diagnostics, portfolio edition</span></button>
+    <button data-command="download cv"><b>download cv</b><span>acquire the paperwork</span></button>
+    <button data-command="clear"><b>clear</b><span>tidy the evidence</span></button>
+  </div><p class="term-dim">Tip: command buttons work. The terminal is friendly, not a gatekeeping exercise.</p></div>`;
+
+  const responses: Record<string, () => string> = {
+    "/help": () => help,
+    "help": () => help,
+    "whoistahsin": () => `<div class="command-result profile-result"><div class="profile-photo"><img src="/profile.webp" alt="Tahsin Ahmed Majumder" /></div><div><p class="result-title">Tahsin Ahmed Majumder</p><p><span class="term-cyan">role</span>      Software Engineer L2 @ ${link("https://welldev.io", "WellDev")}</p><p><span class="term-cyan">location</span>  Dhaka, Bangladesh</p><p><span class="term-cyan">focus</span>     Backend systems · ETL · real-time transit</p><p><span class="term-cyan">runtime</span>   Node.js · Go · Python · ColdFusion</p><p class="prose-result">I build scalable backend systems for European public transportation. Current work moves live transit data, manages driver operations, and turns complicated infrastructure into software people can actually rely on.</p><p class="term-dim">600+ algorithm problems survived. Semicolons remain under investigation.</p></div></div>`,
+    "whoami": () => `<div class="command-result"><p>visitor</p><p class="term-yellow">Close, but this portfolio has custom firmware. Try <button data-command="whoistahsin">whoistahsin</button>.</p></div>`,
+    "ls": () => `<div class="command-result file-list"><button data-command="whoistahsin">about.md</button><button data-command="cat experience.log">experience.log</button><button data-command="ls projects">projects/</button><button data-command="skills --matrix">skills.json</button><button data-command="education">education.txt</button><button data-command="contact">contact.sh</button></div>`,
+    "ls projects": () => `<div class="command-result"><p class="result-title">~/projects <span class="term-dim">4 entries</span></p><div class="project-list">
+      <article><header><b>property-investment-ai/</b><span>Python · ML · NLP</span></header><p>Property flipping analysis, resale prediction, renovation risk, and interactive maps.</p>${link("https://github.com/mohsinian/altri-challenge", "source")}</article>
+      <article><header><b>short-term-rental/</b><span>FastAPI · Supabase</span></header><p>Batch-optimized investment scoring with an eight-component weighted model.</p>${link("https://github.com/mohsinian/Short-Term-Rental-System", "source")} · ${link("https://short-term-rental-frontend.onrender.com/", "demo")}</article>
+      <article><header><b>integration-gateway/</b><span>Go · PostgreSQL</span></header><p>Concurrent multi-source orchestration with circuit breakers, retry, and rate limiting.</p>${link("https://github.com/mohsinian/integration-gateway", "source")}</article>
+      <article><header><b>interface-service/</b><span>Node.js · MariaDB</span></header><p>Real-time transit ETL in production at DVB. Processing throughput improved by 300%.</p><span class="term-yellow">private: Innotix internal</span></article>
+    </div></div>`,
+    "cat experience.log": () => `<div class="command-result"><p class="result-title">experience.log</p><div class="timeline-result">
+      <article><time>2025-07 → now</time><div><b>Software Engineer L2 · WellDev</b><p>Building MQTT/ETL transit interfaces for DVB and driver operations, payment, leave, notifications, and scheduling systems for AAGL.</p></div></article>
+      <article><time>2024-03 → 2025-06</time><div><b>Junior Software Engineer L1 · WellDev</b><p>Maintained a 500K LOC multi-tenant platform for 42+ European transit clients; resolved SLA bugs, improved auth, automated workflows, and mentored trainees.</p></div></article>
+      <article><time>2022-07 → 2022-10</time><div><b>Trainee Software Engineer · Brain Station 23</b><p>Built nopCommerce templates and plugins with .NET Core and Entity Framework.</p></div></article>
+    </div></div>`,
+    "skills --matrix": () => `<div class="command-result"><p class="result-title">Capability matrix</p><div class="skill-matrix"><section><b>languages</b><p>Go <i>████████░░</i></p><p>Node.js <i>█████████░</i></p><p>Python <i>████████░░</i></p><p>SQL <i>████████░░</i></p></section><section><b>systems</b><p>PostgreSQL · MariaDB · MongoDB</p><p>Docker · Git · Bash · Postman</p><p>ETL · MQTT · queues · multi-tenancy</p></section><section><b>also speaks</b><p>C++ · Ruby · ColdFusion</p><p>ExpressJS · Rails · ColdBox</p><p>HTML/CSS, when the backend lets me out</p></section></div></div>`,
+    "education": () => `<div class="command-result"><p class="result-title">education.txt</p><p><span class="term-cyan">institution</span>  Chittagong University of Engineering & Technology</p><p><span class="term-cyan">degree</span>       B.Sc. in Computer Science & Engineering</p><p><span class="term-cyan">period</span>       2018 - 2023</p><p><span class="term-cyan">grade</span>        3.05 / 4.00</p></div>`,
+    "achievements": () => `<div class="command-result"><p class="result-title">Achievement unlocked</p><p><span class="term-green">600+</span> competitive programming problems solved without deleting System32.</p><p>${link("https://www.stopstalk.com/user/profile/invisibleguest", "StopStalk")} · ${link("https://leetcode.com/u/user7083T/", "LeetCode")}</p></div>`,
+    "contact": () => `<div class="command-result"><p class="result-title">Open ports</p><p><span class="term-cyan">email</span>     <a href="mailto:tahsinbd.ahmed1@gmail.com">tahsinbd.ahmed1@gmail.com</a></p><p><span class="term-cyan">github</span>    ${link("https://github.com/mohsinian", "github.com/mohsinian")}</p><p><span class="term-cyan">linkedin</span>  ${link("https://www.linkedin.com/in/tahsin-ahmed-37663b1ab/", "tahsin-ahmed")}</p><p><span class="term-cyan">cv</span>        <a href="${cvUrl}" target="_blank">download.pdf ↗</a></p><p class="term-green">Status: accepting interesting engineering conversations.</p></div>`,
+    "neofetch": () => `<div class="command-result neofetch"><pre>      /\\
+     /  \\
+    / /\ \\
+   / ____ \\
+  /_/    \_\\</pre><div><p><b class="term-cyan">tahsin</b>@<b class="term-green">portfolio</b></p><p>-----------------------</p><p><b>OS:</b> Human 26.0</p><p><b>Host:</b> Dhaka, Bangladesh</p><p><b>Kernel:</b> Backend Engineer L2</p><p><b>Shell:</b> zsh + unreasonable aliases</p><p><b>Uptime:</b> coding since university</p><p><b>Packages:</b> Node, Go, Python, Docker</p><p><b>Memory:</b> selective, backed by notes</p></div></div>`,
+    "pwd": () => `<div class="command-result"><p>/home/tahsin/portfolio</p></div>`,
+    "date": () => `<div class="command-result"><p>${new Date().toString()}</p></div>`,
+  };
+
+  const runCommand = (raw: string) => {
+    const command = raw.trim().toLowerCase().replace(/\s+/g, " ");
+    if (!command) return;
+    history.push(raw.trim());
+    historyIndex = history.length;
+    if (command === "clear") { if (output) output.innerHTML = ""; return; }
+    if (command === "exit") {
+      document.documentElement.dataset.mode = "gui";
+      localStorage.setItem("mode", "gui");
+      window.dispatchEvent(new CustomEvent("portfolio-mode-change", { detail: { mode: "gui" } }));
+      return;
+    }
+    const destinations: Record<string, string> = { "open github": "https://github.com/mohsinian", "open linkedin": "https://www.linkedin.com/in/tahsin-ahmed-37663b1ab/", "download cv": cvUrl };
+    const commandRow = `<div class="echo-row"><span>tahsin@portfolio:~$</span> ${escapeHtml(raw.trim())}</div>`;
+    const response = responses[command]?.() ?? (destinations[command] ? `<div class="command-result"><p>Opening <a href="${destinations[command]}" target="_blank">${destinations[command]}</a>...</p></div>` : `<div class="command-result error-result"><p>zsh: command not found: ${escapeHtml(command)}</p><p>Maybe you meant <button data-command="/help">/help</button>? Even terminals need documentation.</p></div>`);
+    output?.insertAdjacentHTML("beforeend", commandRow + response);
+    if (destinations[command]) window.open(destinations[command], "_blank", "noopener,noreferrer");
+    output?.scrollTo({ top: output.scrollHeight, behavior: "smooth" });
+  };
+
+  form?.addEventListener("submit", (event) => { event.preventDefault(); if (input) { runCommand(input.value); input.value = ""; updateGhost(); } });
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-command]") : null;
+    if (!target?.dataset.command) return;
+    if (document.documentElement.dataset.mode !== "terminal") return;
+    if (target instanceof HTMLAnchorElement) event.preventDefault();
+    runCommand(target.dataset.command);
+    input?.focus();
+  });
+  input?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+      historyIndex = event.key === "ArrowUp" ? Math.max(0, historyIndex - 1) : Math.min(history.length, historyIndex + 1);
+      input.value = history[historyIndex] ?? "";
+      updateGhost();
+    }
+    if (event.key === "Tab") {
+      event.preventDefault();
+      const value = input.value.toLowerCase();
+      const match = commands.find((command) => command.startsWith(value));
+      if (match) input.value = match;
+      updateGhost();
+    }
+    if (event.key === "l" && event.ctrlKey) { event.preventDefault(); if (output) output.innerHTML = ""; }
+  });
+  input?.addEventListener("input", updateGhost);
+  input?.addEventListener("focus", updateGhost);
+  input?.addEventListener("blur", () => ghost?.classList.remove("is-visible"));
+  window.addEventListener("portfolio-mode-change", ((event: CustomEvent<{ mode: string }>) => { if (event.detail.mode === "terminal") setTimeout(() => input?.focus(), 50); }) as EventListener);
+  if (document.documentElement.dataset.mode === "terminal") setTimeout(() => input?.focus(), 50);
+</script>
+
+<style is:global>
+  .terminal-shell { min-height: 100vh; padding: 6.5rem 1.25rem 2rem; color: #d7e0ea; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; background: #080b10; position: relative; overflow: hidden; }
+  .terminal-shell::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .13; background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px); background-size: 100% 4px; z-index: 3; }
+  .terminal-glow { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 38%, rgba(34, 197, 94, .08), transparent 45%); }
+  .terminal-window { position: relative; max-width: 80rem; height: calc(100vh - 8.5rem); min-height: 36rem; margin: 0 auto; display: grid; grid-template-rows: 2.75rem auto 1fr auto 2.25rem; border: 1px solid #2b3646; border-radius: 8px; background: rgba(10, 14, 20, .96); box-shadow: 0 28px 90px rgba(0,0,0,.55), 0 0 55px rgba(34,197,94,.04); overflow: hidden; z-index: 2; }
+  .terminal-titlebar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 .9rem; background: #151b24; border-bottom: 1px solid #2b3646; color: #8995a5; font-size: .72rem; }
+  .terminal-titlebar p { letter-spacing: 0; }
+  .traffic-lights { display: flex; gap: .45rem; }.traffic-lights span { width: .7rem; height: .7rem; border-radius: 50%; background: #ff5f57; }.traffic-lights span:nth-child(2){background:#febc2e}.traffic-lights span:nth-child(3){background:#28c840}
+  .terminal-status { justify-self: end; display: flex; align-items: center; gap: .45rem; }.status-dot { width: .45rem; height: .45rem; border-radius: 50%; background: #4ade80; box-shadow: 0 0 9px #4ade80; }
+  .terminal-toolbar { display: flex; align-items: center; gap: .5rem; min-height: 3rem; padding: .55rem 1.1rem; overflow-x: auto; border-bottom: 1px solid #202a38; color: #64748b; font-size: .68rem; scrollbar-width: none; }
+  .terminal-toolbar button { flex: 0 0 auto; padding: .28rem .55rem; border: 1px solid #304052; border-radius: 4px; color: #8ee6a8; background: #111923; cursor: pointer; transition: 150ms ease; }.terminal-toolbar button:hover { color: #0a0e14; background: #4ade80; border-color: #4ade80; }
+  .terminal-output { overflow-y: auto; padding: 1.35rem 1.5rem; font-size: .82rem; line-height: 1.7; scrollbar-color: #344254 transparent; scrollbar-width: thin; }
+  .boot-block { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 2rem; padding-bottom: 1.25rem; }.ascii-mark { color: #4ade80; font-weight: 700; font-size: clamp(.42rem, .8vw, .72rem); line-height: 1.25; text-shadow: 0 0 14px rgba(74,222,128,.3); }.welcome-line { margin-top: .8rem; }.terminal-output button { color: #67e8f9; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }.terminal-output a { color: #67e8f9; text-decoration: underline; text-underline-offset: 3px; }
+  .terminal-input-row { min-height: 3.2rem; display: flex; align-items: center; padding: .6rem 1.5rem; border-top: 1px solid #202a38; font-size: .84rem; }.terminal-prompt { display: flex; flex-shrink: 0; }.terminal-prompt span:first-child { color:#4ade80}.terminal-prompt span:nth-of-type(2){color:#67e8f9}.terminal-prompt b{color:#8995a5}.terminal-prompt em{color:#c084fc;font-style:normal}.terminal-input-wrap { position: relative; flex: 1; min-width: 0; margin-left: .55rem; }.terminal-input-row input { position: relative; z-index: 1; width: 100%; min-width: 0; outline: none; border: 0; color: #f1f5f9; background: transparent; caret-color: #4ade80; font: inherit; }.terminal-ghost { position: absolute; inset: 0; z-index: 0; pointer-events: none; color: #5d6878; white-space: pre; opacity: 0; transition: opacity 120ms ease; }.terminal-ghost.is-visible { opacity: 1; }
+  .terminal-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.5rem; color: #64748b; background: #0d131b; border-top: 1px solid #202a38; font-size: .65rem; }.terminal-footer kbd { padding: .1rem .25rem; color:#9aa7b7; background:#1d2633; border:1px solid #344254; border-radius:3px; }
+  .echo-row { margin: 1rem 0 .4rem; color: #e2e8f0; }.echo-row span { color: #4ade80; }.command-result { margin: .2rem 0 1.25rem; padding-left: 1rem; border-left: 2px solid #273446; }.result-title { color: #fbbf24; font-weight: 700; margin-bottom: .65rem; }.term-green{color:#4ade80}.term-cyan{color:#67e8f9}.term-yellow{color:#fbbf24}.term-dim{color:#738094}.prose-result{max-width:54rem;margin:.75rem 0;color:#bac5d2}.error-result{border-color:#f87171;color:#fca5a5}
+  .help-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.45rem 1.5rem; margin:.7rem 0; max-width:58rem}.help-grid button{display:grid;grid-template-columns:12rem 1fr;text-align:left;text-decoration:none}.help-grid b{color:#67e8f9}.help-grid span{color:#8995a5}
+  .profile-result { display:grid;grid-template-columns:7rem 1fr;gap:1.25rem;align-items:start}.profile-photo{width:7rem;aspect-ratio:1;border:1px solid #385069;padding:.3rem;background:#111923}.profile-photo img{width:100%;height:100%;object-fit:cover;filter:saturate(.85) contrast(1.04)}
+  .file-list{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem}.file-list button{text-decoration:none;color:#67e8f9}.file-list button:nth-child(3){color:#60a5fa;font-weight:700}
+  .project-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.project-list article{padding:.8rem;border:1px solid #273446;background:#0d131b}.project-list header{display:flex;justify-content:space-between;gap:1rem;color:#67e8f9}.project-list header span{color:#c084fc;font-size:.72rem;text-align:right}.project-list p{margin:.35rem 0;color:#aeb9c6}
+  .timeline-result article{display:grid;grid-template-columns:10rem 1fr;gap:1rem;padding:.5rem 0;border-bottom:1px dashed #263242}.timeline-result time{color:#fbbf24}.timeline-result b{color:#67e8f9}.timeline-result p{color:#aeb9c6}
+  .skill-matrix{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5rem}.skill-matrix section>b{color:#c084fc}.skill-matrix i{color:#4ade80;font-style:normal}.neofetch{display:flex;gap:2rem}.neofetch pre{color:#4ade80;font-weight:700;line-height:1.2}
+  @media(max-width:700px){.terminal-shell{padding:5.5rem .5rem .5rem}.terminal-window{height:calc(100vh - 6rem);min-height:30rem;border-radius:5px}.terminal-titlebar{grid-template-columns:1fr auto}.terminal-titlebar p{display:none}.terminal-output{padding:1rem;font-size:.75rem}.boot-block{grid-template-columns:1fr;gap:.75rem}.ascii-mark{font-size:.48rem}.terminal-input-row{padding:.6rem 1rem;overflow:hidden}.terminal-prompt{font-size:.72rem}.terminal-footer{padding:0 1rem}.terminal-footer>span:first-child{display:none}.help-grid,.project-list,.skill-matrix{grid-template-columns:1fr}.help-grid button{grid-template-columns:9.5rem 1fr}.profile-result{grid-template-columns:4.5rem 1fr}.profile-photo{width:4.5rem}.timeline-result article{grid-template-columns:1fr;gap:0}.project-list header{display:block}.project-list header span{display:block;text-align:left}.neofetch{gap:1rem}.neofetch pre{font-size:.62rem}}
+</style>

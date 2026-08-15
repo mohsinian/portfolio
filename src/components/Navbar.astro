@@ -16,23 +16,18 @@ const navLinks = [
       <a href="#" class="text-lg font-bold text-[var(--color-primary)] tracking-tight">
         TAM<span class="text-accent">.</span>
       </a>
-      <!-- Theme toggle switch -->
-      <button id="theme-toggle" aria-label="Toggle dark mode" class="relative w-14 h-7 rounded-full bg-[var(--color-surface)] border border-[var(--color-card-border)] transition-colors duration-300 flex-shrink-0">
-        <!-- Track icons -->
-        <svg class="absolute left-1.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd" />
+      <button id="mode-toggle" aria-label="Open terminal mode" aria-pressed="false" class="mode-toggle flex items-center gap-2 h-8 px-2.5 rounded-md border border-[var(--color-card-border)] font-mono text-xs text-[var(--color-text-light)] hover:text-accent hover:border-accent/60 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
         </svg>
-        <svg class="absolute right-1.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
-        <!-- Knob -->
-        <span id="toggle-knob" class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-300"></span>
+        <span id="mode-toggle-label">Terminal</span>
       </button>
     </div>
     <div class="hidden md:flex items-center gap-8">
       {navLinks.map((link) => (
         <a
           href={link.href}
+          data-command={link.label === "About" ? "whoistahsin" : link.label === "Skills" ? "skills --matrix" : link.label === "Experience" ? "cat experience.log" : link.label === "Projects" ? "ls projects" : "education"}
           class="text-sm text-[var(--color-text-light)] hover:text-accent transition-colors duration-200"
         >
           {link.label}
@@ -65,7 +60,7 @@ const navLinks = [
   <!-- Mobile menu -->
   <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-3">
     {navLinks.map((link) => (
-      <a href={link.href} class="block text-sm text-[var(--color-text-light)] hover:text-accent transition-colors">
+      <a href={link.href} data-command={link.label === "About" ? "whoistahsin" : link.label === "Skills" ? "skills --matrix" : link.label === "Experience" ? "cat experience.log" : link.label === "Projects" ? "ls projects" : "education"} class="block text-sm text-[var(--color-text-light)] hover:text-accent transition-colors">
         {link.label}
       </a>
     ))}
@@ -89,29 +84,38 @@ const navLinks = [
 </nav>
 
 <script>
-  const toggle = document.getElementById("theme-toggle");
-  const knob = document.getElementById("toggle-knob");
+  const toggle = document.getElementById("mode-toggle");
+  const label = document.getElementById("mode-toggle-label");
   const html = document.documentElement;
 
-  function applyTheme(dark: boolean) {
-    if (dark) {
-      html.classList.add("dark");
-      knob?.style.setProperty("transform", "translateX(1.75rem)");
-    } else {
-      html.classList.remove("dark");
-      knob?.style.setProperty("transform", "translateX(0)");
-    }
+  function applyMode(mode: "gui" | "terminal") {
+    html.dataset.mode = mode;
+    const terminal = mode === "terminal";
+    toggle?.setAttribute("aria-pressed", String(terminal));
+    toggle?.setAttribute("aria-label", terminal ? "Return to portfolio mode" : "Open terminal mode");
+    if (label) label.textContent = terminal ? "Portfolio" : "Terminal";
+    window.dispatchEvent(new CustomEvent("portfolio-mode-change", { detail: { mode } }));
   }
 
-  // Restore saved theme
-  const isDark = localStorage.getItem("theme") !== "light";
-  applyTheme(isDark);
+  function syncModeControls(mode: "gui" | "terminal") {
+    const terminal = mode === "terminal";
+    toggle?.setAttribute("aria-pressed", String(terminal));
+    toggle?.setAttribute("aria-label", terminal ? "Return to portfolio mode" : "Open terminal mode");
+    if (label) label.textContent = terminal ? "Portfolio" : "Terminal";
+  }
+
+  applyMode(html.dataset.mode === "terminal" ? "terminal" : "gui");
 
   toggle?.addEventListener("click", () => {
-    const nowDark = !html.classList.contains("dark");
-    applyTheme(nowDark);
-    localStorage.setItem("theme", nowDark ? "dark" : "light");
+    const mode = html.dataset.mode === "terminal" ? "gui" : "terminal";
+    applyMode(mode);
+    localStorage.setItem("mode", mode);
+    localStorage.removeItem("theme");
   });
+
+  window.addEventListener("portfolio-mode-change", ((event: CustomEvent<{ mode: "gui" | "terminal" }>) => {
+    syncModeControls(event.detail.mode);
+  }) as EventListener);
 
   // Mobile menu
   const btn = document.getElementById("mobile-menu-btn");

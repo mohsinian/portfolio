@@ -17,9 +17,11 @@ const { title } = Astro.props;
     <link rel="icon" type="image/png" href="/profile.png" />
     <title>{title}</title>
     <script is:inline>
-      if (localStorage.getItem("theme") !== "light") {
-        document.documentElement.classList.add("dark");
-      }
+      const savedMode = localStorage.getItem("mode");
+      const legacyTheme = localStorage.getItem("theme");
+      const mode = savedMode || (legacyTheme === "light" ? "terminal" : "gui");
+      document.documentElement.classList.add("dark");
+      document.documentElement.dataset.mode = mode;
     </script>
   </head>
   <body class="font-sans antialiased text-[var(--color-text)]">

@@ -17,19 +17,7 @@ html {
   color: white;
 }
 
-/* Light mode */
 html {
-  --color-primary: #0f172a;
-  --color-surface: #f8fafc;
-  --color-text: #1e293b;
-  --color-text-light: #64748b;
-  --color-bg: #ffffff;
-  --color-border: #f1f5f9;
-  --color-card-border: #f8fafc;
-}
-
-/* Dark mode */
-html.dark {
   --color-primary: #f1f5f9;
   --color-surface: #1e293b;
   --color-text: #e2e8f0;
@@ -40,11 +28,43 @@ html.dark {
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
-html.dark {
-  color-scheme: dark;
+html[data-mode="terminal"] {
+  --color-bg: #080b10;
+}
+
+#terminal-interface {
+  display: none;
+}
+
+html[data-mode="terminal"] #portfolio-interface > :not(nav) {
+  display: none;
+}
+
+html[data-mode="terminal"] #terminal-interface {
+  display: block;
+}
+
+html[data-mode="terminal"] #portfolio-interface nav {
+  background: rgba(8, 11, 16, 0.94);
+  border-color: #253041;
+}
+
+html[data-mode="terminal"] #portfolio-interface nav > div {
+  max-width: 80rem;
+}
+
+html[data-mode="terminal"] #mobile-menu-btn,
+html[data-mode="terminal"] #mobile-menu {
+  display: none;
+}
+
+html[data-mode="terminal"] #bg-canvas,
+html[data-mode="terminal"] #request-log,
+html[data-mode="terminal"] body > div[aria-hidden="true"] {
+  display: none;
 }
 
 body {

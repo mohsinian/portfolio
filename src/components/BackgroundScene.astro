@@ -23,13 +23,20 @@
   // Lazy-load the 3D scene so it never blocks first paint.
   const canvas = document.getElementById("bg-canvas") as HTMLCanvasElement | null;
   if (canvas) {
-    const start = () =>
-      import("../scripts/background-scene").then((m) => m.mountBackgroundScene(canvas));
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(() => void start(), { timeout: 2000 });
-    } else {
-      setTimeout(() => void start(), 200);
-    }
+    let started = false;
+    const start = () => {
+      if (started || document.documentElement.dataset.mode === "terminal") return;
+      started = true;
+      void import("../scripts/background-scene").then((m) => m.mountBackgroundScene(canvas));
+    };
+    const scheduleStart = () => {
+      if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 2000 });
+      else setTimeout(start, 200);
+    };
+    scheduleStart();
+    window.addEventListener("portfolio-mode-change", ((event: CustomEvent<{ mode: string }>) => {
+      if (event.detail.mode === "gui") scheduleStart();
+    }) as EventListener);
   }
 
   // Request ticker — fake traffic logs flavoured with the real domain
