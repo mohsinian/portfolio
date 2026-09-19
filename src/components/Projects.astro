@@ -1,6 +1,18 @@
 ---
 const projects = [
   {
+    title: "Confess-Audit",
+    tech: "TypeScript, Node.js, Anthropic API, NPM",
+    github: "https://github.com/mohsinian/confess",
+    npm: "https://www.npmjs.com/package/confess-audit",
+    items: [
+      "TypeScript CLI that debugs AI coding-agent trajectories, combining deterministic detectors with LLM-based reasoning",
+      "Guardrail gates reject findings unless their evidence verifies verbatim against the transcript",
+      "Benchmarked against a one-shot LLM prompt on 22 planted-failure sessions: detection F1 improved from 70.8% to 79.3% with fewer false positives at identical recall",
+      "Published on NPM with a 59-check offline self-test suite enforced in the publish pipeline",
+    ],
+  },
+  {
     title: "Real Estate Property Investment Analysis",
     tech: "Flask, scikit-learn, XGBoost, NLTK, spaCy, Transformers",
     github: "https://github.com/mohsinian/altri-challenge",
@@ -75,6 +87,15 @@ const projects = [
                   class="text-sm text-accent hover:underline font-medium"
                 >
                   GitHub &rarr;
+                </a>
+              )}
+              {proj.npm && (
+                <a
+                  href={proj.npm}
+                  target="_blank"
+                  class="text-sm text-accent hover:underline font-medium"
+                >
+                  NPM &rarr;
                 </a>
               )}
               {proj.demo && (
