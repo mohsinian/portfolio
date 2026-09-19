@@ -2,15 +2,19 @@
 const skillCategories = [
   {
     title: "Languages",
-    skills: ["C++", "Golang", "Python", "Node.js", "Ruby", "ColdFusion", "HTML/CSS", "SQL"],
+    skills: ["TypeScript", "Node.js", "Python", "Golang", "SQL", "C++", "Ruby", "ColdFusion", "HTML/CSS"],
   },
   {
     title: "Frameworks & Databases",
-    skills: ["ExpressJS", "Rails", "ColdBox", "PostgreSQL", "MySQL", "MariaDB", "MongoDB"],
+    skills: ["FastAPI", "NestJS", "Express", "Flask", "Pydantic", "Zod", "Rails", "ColdBox", "PostgreSQL", "Supabase", "MySQL", "MariaDB", "MongoDB"],
   },
   {
     title: "Developer Tools",
-    skills: ["Git", "GitHub", "Docker", "Bash", "Postman", "VS Code"],
+    skills: ["Git", "GitHub", "Docker", "Linux", "Bash", "NPM", "Vitest", "CI pipelines", "Postman", "VS Code"],
+  },
+  {
+    title: "Data & ML",
+    skills: ["pandas", "NumPy", "scikit-learn", "XGBoost", "Transformers", "spaCy", "MQTT", "ETL pipelines"],
   },
 ];
 ---
@@ -18,7 +22,7 @@ const skillCategories = [
 <section id="skills" class="py-24 px-6">
   <div class="max-w-5xl mx-auto">
     <h2 class="text-2xl font-bold text-[var(--color-primary)] mb-12">Technical Skills</h2>
-    <div class="grid md:grid-cols-3 gap-8">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
       {skillCategories.map((cat) => (
         <div class="machine-panel p-6">
           <h3 class="text-sm font-semibold text-accent uppercase tracking-wider mb-4">
